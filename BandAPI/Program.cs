@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BandAPI.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,28 +17,26 @@ namespace BandAPI
 
             using (var scope = host.Services.CreateScope())
             {
-                try {
-
+                try
+                {
                     var context = scope.ServiceProvider.GetService<BandAlbumContext>();
                     context.Database.EnsureDeleted();
                     context.Database.Migrate();
-
-                 }
-                catch(Exception e) {
+                }
+                catch (Exception e)
+                {
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                     logger.LogError(e, "An error occurred while migration in progress");
-
-              }
+                }
             }
 
-
+            host.Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+        }
     }
 }

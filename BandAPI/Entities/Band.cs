@@ -12,8 +12,8 @@ namespace BandAPI.Entities
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }
-
-
+        
+        
         public DateTime Founded { get; set; }
 
         [Required]
