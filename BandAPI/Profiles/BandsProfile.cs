@@ -16,6 +16,8 @@ namespace BandAPI.Profiles
                         src => $"{src.Founded:yyyy}" +
                                 $"{src.Founded.GetYearsAgo()} years ago")
                 );
+
+            CreateMap<Models.BandForCreatingDto, Entities.Band>();
         }
     }
 }

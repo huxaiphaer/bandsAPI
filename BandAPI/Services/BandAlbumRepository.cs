@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using BandAPI.Controllers;
 using BandAPI.Entities;
+using BandAPI.Helpers;
 
 namespace BandAPI.Services
 {
     public class BandAlbumRepository : IBandAlbumRepository
     {
-
-
+        
         private readonly BandAlbumContext _context;
 
         public BandAlbumRepository(BandAlbumContext context) {
@@ -78,8 +78,8 @@ namespace BandAPI.Services
             if (albumId == null)
                 throw new ArgumentNullException(nameof(albumId));
 
-            return _context.Albums.Where(a => a.BandId == bandId && a.Id == albumId)
-                .FirstOrDefault();
+            return _context.Albums
+                .FirstOrDefault(a => a.BandId == bandId && a.Id == albumId);
             
         }
 
@@ -119,12 +119,41 @@ namespace BandAPI.Services
                 .ToList();
         }
 
+        public IEnumerable<Band> GetBands(BandsResourceParameters bandsResourceParameters)
+        {
+            
+            if(bandsResourceParameters == null)
+               throw new ArgumentNullException(nameof(bandsResourceParameters));
+                
+            if (string.IsNullOrWhiteSpace(bandsResourceParameters.MainGenre) 
+                && string.IsNullOrWhiteSpace(bandsResourceParameters.SearchQuery))
+                return GetBands();
+
+            var collection = _context.Bands as IQueryable<Band>;
+            
+            
+
+            if (!string.IsNullOrWhiteSpace(bandsResourceParameters.MainGenre))
+            {
+                var mainGenre = bandsResourceParameters.MainGenre.Trim();
+                collection = collection.Where(b => b.MainGenre == mainGenre);
+            }
+            
+            if (!string.IsNullOrWhiteSpace(bandsResourceParameters.SearchQuery))
+            {
+                var searchQuery = bandsResourceParameters.SearchQuery.Trim();
+                collection = collection.Where(b => b.Name.Contains(searchQuery));
+            }
+
+            return collection.ToList();
+        }
+
         public bool Save()
         {
             return (_context.SaveChanges() >= 0);
         }
 
-        public void UpadatedAlbum(Album album)
+        public void UpdatedAlbum(Album album)
         {
             //not implemented.
             throw new NotImplementedException();
